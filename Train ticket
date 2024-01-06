@@ -1,0 +1,62 @@
+# Issue_train_ticket
+# with default input
+
+train_sections = {'A': {'seats': [1, 2], 'users': {}},'B': {'seats': [1, 2], 'users': {}}}
+def purchase_ticket(from_location, to_location, first_name, last_name, email, section):
+    global train_sections
+    if section not in ['A', 'B']:
+        return {'error': 'Invalid section. Choose A or B.'}
+    if not train_sections[section]['seats']:
+        return {'error': 'No available seats in this section.'}
+    seat = train_sections[section]['seats'].pop(0)
+    train_sections[section]['users'][seat] = {'First Name': first_name,'Last Name': last_name,'Email': email}
+    receipt = {'From': from_location,'To': to_location,'User': {'First Name': first_name,'Last Name': last_name,
+            'Email': email},'Price Paid': 20,'Section': section,'Seat': seat}
+    return receipt
+def view_receipt(section, seat):
+    global train_sections
+    user_details = train_sections[section]['users'].get(seat)
+    if user_details:
+        receipt = {'From': 'London','To': 'France','User': user_details,'Price Paid': 20,'Section': section,'Seat': seat}
+        return receipt
+    else:
+        return {'error': 'User not found.'}
+def view_users_by_section(section):
+    global train_sections
+    return train_sections[section]['users']
+def remove_user(section, seat):
+    global train_sections
+
+    if seat in train_sections[section]['users']:
+        del train_sections[section]['users'][seat]
+        train_sections[section]['seats'].append(seat)
+        return {'message': 'User removed successfully.'}
+    else:
+        return {'error': 'User not found.'}
+
+def modify_seat(section, old_seat, new_seat):
+    global train_sections
+
+    if old_seat in train_sections[section]['users']:
+        user_details = train_sections[section]['users'].pop(old_seat)
+        train_sections[section]['seats'].append(old_seat)
+        train_sections[section]['users'][new_seat] = user_details
+        train_sections[section]['seats'].remove(new_seat)
+        return {'message': 'User seat modified successfully.'}
+    else:
+        return {'error': 'User not found.'}
+
+ticket_receipt = purchase_ticket('London', 'France', 'John', 'Doe', 'john.123@gmail.com', 'A')
+print("1. Purchase Ticket Receipt:", ticket_receipt)
+
+user_receipt = view_receipt('A', 1)
+print("\n2. User Receipt:", user_receipt)
+
+users_section_A = view_users_by_section('A')
+print("\n3. Users in Section A:", users_section_A)
+
+remove_result = remove_user('A', 1)
+print("\n4. Remove User Result:", remove_result)
+
+modify_result = modify_seat('A', 2, 3)
+print("\n5. Modify User's Seat Result:", modify_result)
